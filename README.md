@@ -1,47 +1,57 @@
 # KZG Commitment on Multiple Points
 
-This code implements both the **Prover** and **Verifier** sides of the KZG polynomial commitment scheme on multiple points (constant-sized proof) using elliptic curve pairings over the BLS12-381 curve. The protocol allows for efficient polynomial commitment, evaluation proofs, and verification leveraging elliptic curve cryptography and bilinear pairings.
+This implementation extends the KZG commitment scheme to support **batch evaluation proofs** for multiple points simultaneously, using techniques from [Aggregatable Subvector Commitments](https://alinush.github.io/2020/05/06/aggregatable-subvector-commitments-for-stateless-cryptocurrencies.html). The scheme leverages elliptic curve pairings over BLS12-381 for efficient cryptographic operations.
 
-## Key Features:
-- **Trusted Setup**: Generates public parameters, including the **commitment key (ck)** and **verification key (vk)**, to enable polynomial commitments up to a maximum degree `d`.
-- **Polynomial Commitment**: The **Prover** commits to a polynomial `f(x)` without revealing its coefficients.
-- **Evaluation Proof**: The Prover can compute and send a proof that `f(s) = z` for some value `s`. The proof involves creating a quotient polynomial.
-- **Verification**: The **Verifier** checks the validity of the evaluation proof using the bilinear pairing properties of the elliptic curve.
-- **Elliptic Curve Pairings**: Implements the BLS12-381 curve to compute pairings for secure verification.
+## Key Enhancements:
+- **Batch Evaluation Proofs**: Prove polynomial evaluations at multiple points with a single proof (constant-sized proof).
+- **Constant-Sized Verification**: Verification complexity remains O(1) regardless of points count.
+- **Aggregation-Friendly**: Designed for efficient proof aggregation scenarios.
+- **Subvector Commitments**: Support for proving polynomial evaluations on arbitrary subsets of points.
 
 ## Classes and Functions:
-
 ### **Trusted_Setup**
 Generates public parameters for the protocol.
 - **`generate_public_parameters()`**: Generates the **commitment key (ck)** and **verification key (vk)**.
 
 ### **Prover**
-Handles polynomial commitment and proof generation.
-- **`commit(f)`**: Computes a commitment to a polynomial `f(x)` using the public parameters.
-- **`eval(f, s)`**: Creates a quotient polynomial proof for the evaluation of `f(s)`.
+- **`commit(f)`**: Commits to polynomial `f(x)` using G1 group elements.
+- **`eval(points)`**: Generates quotient proof for multiple evaluation points.
+- **`quotient_poly(points)`**: Computes (f(x) - R_I(x)) / A_I(x) for vanishing poly A_I, and R_I is a polynomial s.t. R_I(s) = f(s) for all s in I.
 
 ### **Verifier**
-Verifies the Prover’s commitment and evaluation proof.
-- **`verify(c_f, s, z, c_q)`**: Verifies that the commitment `c_f` satisfies `f(s) = z` using the quotient commitment `c_q`.
+- **`verify(commitment, points, values, proof)`**: 
+  - Checks pairing equation: e(C - [R_I(τ)]_1, h) = e(π, [A_I(τ)]_2)
 
 ## Tests:
-The implementation includes three tests to validate the correctness of the KZG scheme:
+The code contains both unit tests and end-to-end tests.
 
-1. **Manual Polynomial (Correct Commitment)**: Commits to a polynomial `f(x) = 1 + 2x + 3x^2` and verifies the evaluation at `s = 2`.
-2. **Small Random Polynomial (Correct Commitment)**: Commits to a randomly generated polynomial and verifies the evaluation.
-3. **Small Random Polynomial (Wrong Evaluation)**: Tests failure when the Prover provides an incorrect evaluation value.
+### Unit Tests
+Unit tests are used to test vanishing polynomial construction and quotient polynomial construction for small polynomials.
 
-### Test Scenarios:
+#### Test Scenarios:
 ```python
-assert(manual_polynomial_correct_commitment() == True)
-assert(small_random_polynomial_wrong_evaluation_commitment() == False)
-assert(small_random_polynomial_correct_commitment() == True)
+single_point_vanishing_polynomial_check()
+two_points_vanishing_polynomial_check()
+single_point_small_polynomial_quotient_check()
+two_points_small_polynomial_quotient_check_1()
+two_points_small_polynomial_quotient_check_2()
+```
+
+### End-to-End Tests
+End-to-end tests are used to test the whole process (proving and verification).
+
+#### Test Scenarios:
+```python
+assert(multiple_point_manual_polynomial_correct_commitment_1() == True)
+assert(multiple_point_manual_polynomial_correct_commitment_2() == True)
+assert(multiple_point_small_random_polynomial_correct_commitment() == True)
+assert(multiple_point_small_random_polynomial_wrong_evaluation_commitment() == False)
 ```
 
 ## Usage:
 1. Install dependencies:
    ```
-   pip install py_arkworks_bls12381 numpy
+   pip install py_arkworks_bls12381 numpy sympy
    ```
 2. Set the maximum degree for polynomial commitments:
    ```python
@@ -51,17 +61,20 @@ assert(small_random_polynomial_correct_commitment() == True)
    ```
 3. Commit and verify a polynomial:
    ```python
-   f = P.Polynomial([1, 2, 3])  # Define polynomial
+   f = P.Polynomial([3, 2, 1])  # Define polynomial (3x^2 + 2x + 1)
    prover = Prover(ck, f)
    verifier = Verifier(vk)
 
-   c_f = prover.commit()
-   s = 2 # The point that the prover is committing to.
-   z = int(f(s))
-   c_q = prover.eval(s)
+   polynomial_commitment = prover.commit()
 
-   assert verifier.verify(c_f, s, z, c_q) == True
+   points = [1, 2] # The set of points the prover is committing to
+   values = [int(polynomial_eval(f, point)) for point in points]
+   
+   quotient_polynomial_commitment = prover.eval(points)
+
+   assert verifier.verify(polynomial_commitment, points, values, quotient_polynomial_commitment) == True
    ```
-
+   
 ## References:
+[Aggregatable Subvector Commitments for Stateless Cryptocurrencies from Lagrange Polynomials]([https://hackmd.io/769wh787T8SNaFwmNX74fA](https://alinush.github.io/2020/05/06/aggregatable-subvector-commitments-for-stateless-cryptocurrencies.html)) by Alin Tomescu, Ittai Abraham, Vitalik Buterin, Justin Drake, Dankrad Feist, and Dmitry Khovratovich.
 [KZG Polynomial Commitment tutorial](https://hackmd.io/769wh787T8SNaFwmNX74fA) by Dr. Anca Nitulescu.
