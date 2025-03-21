@@ -42,10 +42,10 @@ End-to-end tests are used to test the whole process (proving and verification).
 
 #### Test Scenarios:
 ```python
-assert(multiple_point_manual_polynomial_correct_commitment_1() == True)
-assert(multiple_point_manual_polynomial_correct_commitment_2() == True)
-assert(multiple_point_small_random_polynomial_correct_commitment() == True)
-assert(multiple_point_small_random_polynomial_wrong_evaluation_commitment() == False)
+multiple_point_manual_polynomial_correct_commitment_1()
+multiple_point_manual_polynomial_correct_commitment_2()
+multiple_point_small_random_polynomial_correct_commitment()
+multiple_point_small_random_polynomial_wrong_evaluation_commitment()
 ```
 
 ## Usage:
