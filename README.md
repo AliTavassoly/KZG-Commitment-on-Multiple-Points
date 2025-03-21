@@ -1,6 +1,6 @@
-# KZG Commitment Scheme Implementation
+# KZG Commitment on Multiple Points
 
-This code implements both the **Prover** and **Verifier** sides of the KZG polynomial commitment scheme using elliptic curve pairings over the BLS12-381 curve. The protocol allows for efficient polynomial commitment, evaluation proofs, and verification leveraging elliptic curve cryptography and bilinear pairings.
+This code implements both the **Prover** and **Verifier** sides of the KZG polynomial commitment scheme on multiple points (constant-sized proof) using elliptic curve pairings over the BLS12-381 curve. The protocol allows for efficient polynomial commitment, evaluation proofs, and verification leveraging elliptic curve cryptography and bilinear pairings.
 
 ## Key Features:
 - **Trusted Setup**: Generates public parameters, including the **commitment key (ck)** and **verification key (vk)**, to enable polynomial commitments up to a maximum degree `d`.
