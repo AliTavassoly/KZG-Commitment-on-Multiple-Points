@@ -76,5 +76,6 @@ assert(multiple_point_small_random_polynomial_wrong_evaluation_commitment() == F
    ```
    
 ## References:
-[Aggregatable Subvector Commitments for Stateless Cryptocurrencies from Lagrange Polynomials]((https://alinush.github.io/2020/05/06/aggregatable-subvector-commitments-for-stateless-cryptocurrencies.html)) by Alin Tomescu, Ittai Abraham, Vitalik Buterin, Justin Drake, Dankrad Feist, and Dmitry Khovratovich.
+[Aggregatable Subvector Commitments for Stateless Cryptocurrencies from Lagrange Polynomials](https://alinush.github.io/2020/05/06/aggregatable-subvector-commitments-for-stateless-cryptocurrencies.html) by Alin Tomescu, Ittai Abraham, Vitalik Buterin, Justin Drake, Dankrad Feist, and Dmitry Khovratovich.
+
 [KZG Polynomial Commitment tutorial](https://hackmd.io/769wh787T8SNaFwmNX74fA) by Dr. Anca Nitulescu.
